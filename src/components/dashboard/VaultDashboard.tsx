@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock, Plus, Shield, User, Calendar, FileText, Clock } from 'lucide-react';
 import { toast } from "sonner";
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 const categories = [
   { id: 'all', name: 'All', count: 16 },
@@ -62,9 +63,10 @@ const VaultActivity: React.FC<VaultActivityProps> = ({ timestamp, action, detail
 
 const VaultDashboard: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const navigate = useNavigate();
   
   const handleNewEntry = () => {
-    toast("Create a new vault entry");
+    navigate('/new-entry');
   };
   
   return (
