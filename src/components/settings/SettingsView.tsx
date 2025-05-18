@@ -1,17 +1,43 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Settings, User, Lock, Mail, Bell, Globe, Trash, Download } from 'lucide-react';
+import { Settings as SettingsIcon, User, Lock, Mail, Bell, Globe, Trash, Download, Language, Moon, Sun, Monitor } from 'lucide-react';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const SettingsView: React.FC = () => {
+  const [theme, setTheme] = useState<string>('dark');
+  const [language, setLanguage] = useState<string>('en-US');
+  
+  // Apply theme on change
+  useEffect(() => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+    
+    localStorage.setItem('vaultbox-theme', theme);
+    toast.success(`Theme changed to ${theme} mode`);
+  }, [theme]);
+  
+  // Load saved preferences on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('vaultbox-theme');
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+    
+    const savedLanguage = localStorage.getItem('vaultbox-language');
+    if (savedLanguage) {
+      setLanguage(savedLanguage);
+    }
+  }, []);
+
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     toast.success("Profile updated successfully");
@@ -19,6 +45,12 @@ const SettingsView: React.FC = () => {
 
   const handleExportData = () => {
     toast.success("Your data export is being prepared");
+  };
+  
+  const handleLanguageChange = (value: string) => {
+    setLanguage(value);
+    localStorage.setItem('vaultbox-language', value);
+    toast.success(`Language changed to ${value}`);
   };
 
   return (
@@ -72,30 +104,35 @@ const SettingsView: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>Theme</Label>
-              <RadioGroup defaultValue="dark" className="flex gap-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="light" id="light" />
-                  <Label htmlFor="light">Light</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="dark" id="dark" />
-                  <Label htmlFor="dark">Dark</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="system" id="system" />
-                  <Label htmlFor="system">System</Label>
-                </div>
-              </RadioGroup>
+              <ToggleGroup 
+                type="single" 
+                value={theme} 
+                onValueChange={(value) => value && setTheme(value)}
+                className="justify-start"
+              >
+                <ToggleGroupItem value="light" aria-label="Light mode">
+                  <Sun className="h-4 w-4 mr-2" />
+                  Light
+                </ToggleGroupItem>
+                <ToggleGroupItem value="dark" aria-label="Dark mode">
+                  <Moon className="h-4 w-4 mr-2" />
+                  Dark
+                </ToggleGroupItem>
+                <ToggleGroupItem value="system" aria-label="System mode">
+                  <Monitor className="h-4 w-4 mr-2" />
+                  System
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
             
             <Separator />
             
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label>Language</Label>
-              <Select defaultValue="en-US">
-                <SelectTrigger className="w-[180px]">
+              <Select value={language} onValueChange={handleLanguageChange}>
+                <SelectTrigger className="w-[240px]">
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
                 <SelectContent>

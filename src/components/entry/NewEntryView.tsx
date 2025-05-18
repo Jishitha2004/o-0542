@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,9 @@ import { useNavigate } from 'react-router-dom';
 const NewEntryView: React.FC = () => {
   const [date, setDate] = useState<Date>();
   const [category, setCategory] = useState('password');
+  const [fileName, setFileName] = useState<string>('');
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleCancel = () => {
     navigate('/dashboard');
@@ -26,6 +28,20 @@ const NewEntryView: React.FC = () => {
   const handleSave = () => {
     toast.success("Entry saved successfully");
     navigate('/dashboard');
+  };
+  
+  const handleBrowseClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFileName(file.name);
+      toast.success(`File selected: ${file.name}`);
+    }
   };
   
   return (
@@ -111,9 +127,22 @@ const NewEntryView: React.FC = () => {
                   <div className="border-2 border-dashed rounded-lg p-6 text-center">
                     <FileUp className="mx-auto h-8 w-8 text-muted-foreground" />
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Drag and drop your document here, or click to browse
+                      {fileName ? `Selected: ${fileName}` : 'Drag and drop your document here, or click to browse'}
                     </p>
-                    <Button variant="outline" className="mt-4">Browse Files</Button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <Button 
+                      variant="outline" 
+                      className="mt-4" 
+                      onClick={handleBrowseClick}
+                      type="button"
+                    >
+                      Browse Files
+                    </Button>
                   </div>
                 </div>
               </div>
